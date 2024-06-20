@@ -516,7 +516,6 @@ open class SocketManager: NSObject, SocketManagerSpec, SocketParsable, SocketDat
 
         currentReconnectAttempt += 1
         if status == .connecting {
-            self.didDisconnect(reason: "Reconnect Failed")
             self.status = .notConnected
         } else {
             connect()
