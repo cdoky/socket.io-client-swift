@@ -196,6 +196,7 @@ open class SocketManager: NSObject, SocketManagerSpec, SocketParsable, SocketDat
             addEngine()
         }
 
+        DefaultSocketLogger.Logger.log("Begin connecting", type: SocketManager.logType)
         status = .connecting
 
         engine?.connect()
@@ -514,8 +515,13 @@ open class SocketManager: NSObject, SocketManagerSpec, SocketParsable, SocketDat
         }
 
         currentReconnectAttempt += 1
-        connect()
-
+        if status == .connecting {
+            self.didDisconnect(reason: "Reconnect Failed")
+            self.status = .notConnected
+        } else {
+            connect()
+        }
+    
         let interval = reconnectInterval(attempts: currentReconnectAttempt)
         DefaultSocketLogger.Logger.log("Scheduling reconnect in \(interval)s", type: SocketManager.logType)
         handleQueue.asyncAfter(deadline: .now() + interval, execute: _tryReconnect)
